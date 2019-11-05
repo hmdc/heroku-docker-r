@@ -1,10 +1,11 @@
 FROM virtualstaticvoid/heroku-docker-r
 
-# install shiny
-RUN /usr/bin/R --no-save --quiet --slave -e "install.packages('shiny')"
-
 # on build, copy application files
 ONBUILD COPY . /app
+
+# install shiny
+ONBUILD RUN if [ -f "/app/packrat/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/packrat/init.R --args --bootstrap-packrat; fi;
+ONBUILD RUN if [ ! -f "/app/packrat/init.R" ]; then /usr/bin/R --no-save --quiet --slave -e "install.packages('packrat'); packrat::init(); packrat::snapshot()"; fi
 
 # on build, for installing additional dependencies etc.
 ONBUILD RUN if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi;
@@ -17,4 +18,5 @@ ONBUILD RUN if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --
 
 # on build, packrat restore packages
 # NOTE: packrat itself is packaged in this same structure so will be bootstrapped here
-ONBUILD RUN if [ -f "/app/packrat/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/packrat/init.R --args --bootstrap-packrat; fi;
+# ONBUILD RUN if [ -f "/app/packrat/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/packrat/init.R --args --bootstrap-packrat; fi;
+# ONBUILD RUN if [ ! -f "/app/packrat/init.R" ]; then /usr/bin/R --no-save --quiet --slave -e "install.packages('packrat'); packrat::init(); packrat::snapshot()"; fi

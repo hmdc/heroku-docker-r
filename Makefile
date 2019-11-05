@@ -7,11 +7,11 @@ all:: build
 R_VERSION:=3.5.2
 APT_VERSION:=$(R_VERSION)-1bionic
 
-MAINTAINER:="Chris Stefano <virtualstaticvoid@gmail.com>"
-MAINTAINER_URL:="https://github.com/virtualstaticvoid/heroku-docker-r"
-IMAGE_NAME:=virtualstaticvoid/heroku-docker-r
-IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)
-GIT_SHA:="$(shell git rev-parse HEAD)"
+MAINTAINER:="Evan Sarmiento <esarmien@g.harvard.edu>"
+MAINTAINER_URL:="https://github.com/hmdc/heroku-docker-r"
+IMAGE_NAME:=hmdc/heroku-docker-r
+GIT_SHA:=$(shell git rev-parse HEAD)
+IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
 GIT_DATE:="$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%d %H:%M:%S +0000' --format='%cd')"
 BUILD_DATE:="$(shell date -u '+%Y-%m-%d %H:%M:%S %z')"
 
@@ -24,7 +24,7 @@ build:
 		--build-arg APT_VERSION=$(APT_VERSION) \
 		--build-arg MAINTAINER=$(MAINTAINER) \
 		--build-arg MAINTAINER_URL=$(MAINTAINER_URL) \
-		--build-arg GIT_SHA=$(GIT_SHA) \
+		--build-arg GIT_SHA="$(GIT_SHA)" \
 		--build-arg GIT_DATE=$(GIT_DATE) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--tag $(IMAGE_TAG) \
