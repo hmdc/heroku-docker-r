@@ -11,7 +11,16 @@ MAINTAINER:="Evan Sarmiento <esarmien@g.harvard.edu>"
 MAINTAINER_URL:="https://github.com/hmdc/heroku-docker-r"
 IMAGE_NAME:=hmdc/heroku-docker-r
 GIT_SHA:=$(shell git rev-parse HEAD)
-IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
+GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
+
+ifeq ($(GIT_BRANCH), master)
+	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
+	PREFIX:=
+else
+	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_BRANCH)-$(GIT_SHA)
+	PREFIX:=$(GIT_BRANCH)-
+endif
+
 GIT_DATE:="$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%d %H:%M:%S +0000' --format='%cd')"
 BUILD_DATE:="$(shell date -u '+%Y-%m-%d %H:%M:%S %z')"
 
@@ -28,30 +37,31 @@ build:
 		--build-arg GIT_DATE=$(GIT_DATE) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--tag $(IMAGE_TAG) \
-		--tag $(IMAGE_NAME):latest \
+		--tag $(IMAGE_NAME):$(PREFIX)latest \
 		--file Dockerfile .
 
 	# "build" image
 	docker build \
 		--tag $(IMAGE_TAG)-build \
-		--tag $(IMAGE_NAME):build \
+		--tag $(IMAGE_NAME):$(PREFIX)build \
 		--file Dockerfile.build .
 
 	# "shiny" image
 	docker build \
 		--tag $(IMAGE_TAG)-shiny \
-		--tag $(IMAGE_NAME):shiny \
+		--tag $(IMAGE_NAME):$(PREFIX)shiny \
 		--file Dockerfile.shiny .
 
 push:
 
-	docker push $(IMAGE_NAME):latest
+	ifeq ($(GIT_BRANCH), master)
+		docker push $(IMAGE_NAME):latest
+		docker push $(IMAGE_NAME):build
+		docker push $(IMAGE_NAME):shiny
+	endif
+
 	docker push $(IMAGE_TAG)
-
-	docker push $(IMAGE_NAME):build
 	docker push $(IMAGE_TAG)-build
-
-	docker push $(IMAGE_NAME):shiny
 	docker push $(IMAGE_TAG)-shiny
 
 test:
