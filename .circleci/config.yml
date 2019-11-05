@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/buildpack-deps:18.04
+    parallelism: 4
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          command: |
+            circleci tests split versions.txt | xargs -I RV -n 1 make -e R_VERSION=RV
