@@ -53,13 +53,9 @@ build:
 		--file Dockerfile.shiny .
 
 push:
-
-	ifeq ($(GIT_BRANCH), master)
-		docker push $(IMAGE_NAME):latest
-		docker push $(IMAGE_NAME):build
-		docker push $(IMAGE_NAME):shiny
-	endif
-
+	docker push $(IMAGE_NAME):$(PREFIX)latest
+	docker push $(IMAGE_NAME):$(PREFIX)build
+	docker push $(IMAGE_NAME):$(PREFIX)shiny
 	docker push $(IMAGE_TAG)
 	docker push $(IMAGE_TAG)-build
 	docker push $(IMAGE_TAG)-shiny
