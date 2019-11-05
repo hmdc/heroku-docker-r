@@ -7,6 +7,7 @@ ARG GIT_DATE
 ARG BUILD_DATE
 ARG MAINTAINER
 ARG MAINTAINER_URL
+ARG APT_GPG_KEY_ID=51716619E084DAB9
 
 LABEL "r.version"="$R_VERSION" \
       "r.version.apt"="$APT_VERSION" \
@@ -28,7 +29,7 @@ ENV LANG en_US.UTF-8
 COPY helpers.R /etc/R/helpers.R
 
 # install R & set default CRAN repo
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 \
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
   && echo 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' > /etc/apt/sources.list.d/cran.list \
   && apt-get update -q \
   && apt-get install -qy --no-install-recommends \
