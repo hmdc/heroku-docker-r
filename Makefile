@@ -89,8 +89,7 @@ test:
 	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
 	# Simple curl test
-	CONTAINER_ID=$$(docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION))
-	# Sleeping 10s
-	sleep 10s
-	# Running simple curl
-	docker exec -i -t $$CONTAINER_ID curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f
+	docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION)|while read CONTAINER_ID; do \
+		sleep 10s; \
+		docker exec -i -t $$CONTAINER_ID curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f; \
+	done
