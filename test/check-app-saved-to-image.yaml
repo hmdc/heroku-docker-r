@@ -1,0 +1,15 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+- name: 'app.R'
+  path: '/app/app.R'
+  shouldExist: true
+- name: 'run.R'
+  path: '/app/run.R'
+  shouldExist: true
+- name: 'packrat/packrat.lock'
+  path: '/app/packrat/packrat.lock'
+  shouldExist: true
+- name: 'packrat/init.R'
+  path: '/app/packrat/init.R'
+  shouldExist: true

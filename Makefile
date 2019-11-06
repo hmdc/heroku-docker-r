@@ -76,10 +76,17 @@ push:
 test:
 	# No reporting available yet.
 	# https://github.com/GoogleContainerTools/container-structure-test/issues/207
+	# Downloading container-structure-test
 	mkdir -p ./bin
 	if [ ! -f "./bin/container-structure-test-$(CONTAINER_TEST_VERSION)" ]; then curl -L https://storage.googleapis.com/container-structure-test/v$(CONTAINER_TEST_VERSION)/container-structure-test-$(OS)-amd64 -o ./bin/container-structure-test-$(CONTAINER_TEST_VERSION); fi
 	chmod a+x ./bin/container-structure-test-$(CONTAINER_TEST_VERSION)
+	# Running basic tests on parent image
 	for image in "$(IMAGE_NAME):$(PREFIX)" "$(IMAGE_NAME):$(PREFIX)-build" "$(IMAGE_NAME):$(PREFIX)-shiny"; do \
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-container-metadata.yaml --image $$image; \
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-r-version-is-$(R_VERSION).yaml --image $$image; \
 	done
+	# Running tests on child imageg
+	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test
+	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
+
+
