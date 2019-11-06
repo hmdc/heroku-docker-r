@@ -1,5 +1,5 @@
 ---
-name: Sid Epic
+name: Heroku R epic
 about: This template ensures we get all the default labels in  place
 title: 'Epic: '
 labels: BV.Undefined, C.Undefined, Card.Epic, Epic.Undefined, S.Undefined, SP.Undefined
