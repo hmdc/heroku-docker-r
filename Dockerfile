@@ -35,7 +35,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
     libgsl0-dev \
     r-base-core=$APT_VERSION \
     r-base-dev=$APT_VERSION \
-    r-recommended=$APT_VERSION \
   && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/* \
   && echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
