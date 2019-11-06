@@ -63,6 +63,9 @@ push:
 	docker push $(IMAGE_NAME):$(PREFIX)
 	docker push $(IMAGE_NAME):$(PREFIX)-build
 	docker push $(IMAGE_NAME):$(PREFIX)-shiny
+	docker tag $(IMAGE_NAME):$(PREFIX) $(IMAGE_TAG)
+	docker tag $(IMAGE_NAME):$(PREFIX)-build $(IMAGE_TAG)-build
+	docker tag $(IMAGE_NAME):$(PREFIX)-shiny $(IMAGE_TAG)-shiny
 	docker push $(IMAGE_TAG)
 	docker push $(IMAGE_TAG)-build
 	docker push $(IMAGE_TAG)-shiny
