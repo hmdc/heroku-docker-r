@@ -85,6 +85,12 @@ test:
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-container-metadata.yaml --image $$image; \
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-r-version-is-$(R_VERSION).yaml --image $$image; \
 	done
-	# Running tests on child imageg
+	# Running tests on child image
 	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
+	# Simple curl test
+	docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION)
+	# Sleeping 10s
+	sleep 10s
+	# Running simple curl
+	curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f
