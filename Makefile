@@ -55,9 +55,9 @@ build:
 		--file Dockerfile.shiny .
 
 output:
-	docker save -o ${IMAGE_NAME}-$(PREFIX).tar $(IMAGE_NAME):$(PREFIX)
-	docker save -o ${IMAGE_NAME}-$(PREFIX)-build.tar $(IMAGE_NAME):$(PREFIX)-build
-	docker save -o $(IMAGE_NAME)-$(PREFIX)-shiny.tar $(IMAGE_NAME):$(PREFIX)-shiny
+	docker save -o hmdc-heroku-docker-r-$(PREFIX).tar $(IMAGE_NAME):$(PREFIX)
+	docker save -o hmdc-heroku-docker-r-$(PREFIX)-build.tar $(IMAGE_NAME):$(PREFIX)-build
+	docker save -o hmdc-heroku-docker-r-$(PREFIX)-shiny.tar $(IMAGE_NAME):$(PREFIX)-shiny
 
 push:
 	docker push $(IMAGE_NAME):$(PREFIX)
