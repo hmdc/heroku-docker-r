@@ -15,10 +15,10 @@ GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 
 ifeq ($(GIT_BRANCH), master)
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
-	PREFIX:=
+	PREFIX:=$(R_VERSION)-
 else
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_BRANCH)-$(GIT_SHA)
-	PREFIX:=$(GIT_BRANCH)-
+	PREFIX:=$(R_VERSION)-$(GIT_BRANCH)-
 endif
 
 GIT_DATE:="$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%d %H:%M:%S +0000' --format='%cd')"
@@ -52,6 +52,11 @@ build:
 		--tag $(IMAGE_NAME):$(PREFIX)shiny \
 		--file Dockerfile.shiny .
 
+output:
+	docker save -o ${IMAGE_NAME}-$(PREFIX)latest.tar $(IMAGE_NAME):$(PREFIX)latest
+	docker save -o ${IMAGE_NAME}-$(PREFIX)build.tar $(IMAGE_NAME):$(PREFIX)build
+	docker save -o $(IMAGE_NAME)-$(PREFIX)shiny.tar $(IMAGE_NAME):$(PREFIX)shiny
+
 push:
 	docker push $(IMAGE_NAME):$(PREFIX)latest
 	docker push $(IMAGE_NAME):$(PREFIX)build
@@ -59,6 +64,7 @@ push:
 	docker push $(IMAGE_TAG)
 	docker push $(IMAGE_TAG)-build
 	docker push $(IMAGE_TAG)-shiny
+
 
 test:
 

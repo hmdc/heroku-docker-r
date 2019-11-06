@@ -8,8 +8,10 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Build containers for R versions
           command: |
-            circleci tests split versions.txt | xargs -I RV -n 1 make -e R_VERSION=RV build
+            circleci tests split versions.txt | xargs -I RV -n 1 make -e R_VERSION=RV build output
+
   push:
     docker:
       - image: circleci/buildpack-deps:18.04
@@ -17,10 +19,13 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           command: |
             docker login --username ${DOCKERHUB_USER} --password ${DOCKERHUB_PASS}
-            circleci tests split versions.txt | xargs -I RV -n 1 make -e R_VERSION=RV push
+            find /tmp/workspace -name "*.tar" -exec docker load -i {} \;
+            cat versions.txt|while read RVER; make -e R_VERSION=$RVER push; done
 workflows:
   version: 2
   build-and-push:
