@@ -1,0 +1,11 @@
+---
+schemaVersion: "2.0.0"
+metadataTest:
+  env:
+    - key: LC_ALL
+      value: en_US.UTF-8
+    - key: LANG
+      value: en_US.UTF-8
+  entrypoint: []
+  cmd: ["/usr/bin/R", "--no-save"]
+  workdir: "/app"

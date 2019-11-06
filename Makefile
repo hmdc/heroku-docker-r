@@ -11,7 +11,9 @@ MAINTAINER:="Evan Sarmiento <esarmien@g.harvard.edu>"
 MAINTAINER_URL:="https://github.com/hmdc/heroku-docker-r"
 IMAGE_NAME:=hmdc/heroku-docker-r
 GIT_SHA:=$(shell git rev-parse HEAD)
+OS:=$(shell uname | tr '[:upper:]' '[:lower:]')
 GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
+CONTAINER_TEST_VERSION:=1.8.0
 
 ifeq ($(GIT_BRANCH), master)
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
@@ -72,6 +74,12 @@ push:
 
 
 test:
-
-	# TODO
-	@echo ""
+	# No reporting available yet.
+	# https://github.com/GoogleContainerTools/container-structure-test/issues/207
+	mkdir -p ./bin
+	if [[ ! -f "./bin/container-structure-test-$(CONTAINER_TEST_VERSION)" ]]; then curl -L https://storage.googleapis.com/container-structure-test/v$(CONTAINER_TEST_VERSION)/container-structure-test-$(OS)-amd64 -o ./bin/container-structure-test-$(CONTAINER_TEST_VERSION); fi
+	chmod a+x ./bin/container-structure-test-$(CONTAINER_TEST_VERSION)
+	for image in "$(IMAGE_NAME):$(PREFIX)" "$(IMAGE_NAME):$(PREFIX)-build" "$(IMAGE_NAME):$(PREFIX)-shiny"; do \
+		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-container-metadata.yaml --image $$image; \
+		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-r-version-is-$(R_VERSION).yaml --image $$image; \
+	done
