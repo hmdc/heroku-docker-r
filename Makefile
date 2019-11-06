@@ -92,4 +92,5 @@ test:
 	docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION)|while read CONTAINER_ID; do \
 		sleep 10s; \
 		docker exec $$CONTAINER_ID curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f; \
+		docker kill $$CONTAINER_ID; \
 	done
