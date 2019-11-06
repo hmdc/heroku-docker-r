@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/buildpack-deps:18.04
-    parallelism: 5
+    parallelism: 4
     steps:
       - checkout
       - setup_remote_docker
