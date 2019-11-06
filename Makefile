@@ -77,7 +77,7 @@ test:
 	# No reporting available yet.
 	# https://github.com/GoogleContainerTools/container-structure-test/issues/207
 	mkdir -p ./bin
-	if [[ ! -f "./bin/container-structure-test-$(CONTAINER_TEST_VERSION)" ]]; then curl -L https://storage.googleapis.com/container-structure-test/v$(CONTAINER_TEST_VERSION)/container-structure-test-$(OS)-amd64 -o ./bin/container-structure-test-$(CONTAINER_TEST_VERSION); fi
+	if [ ! -f "./bin/container-structure-test-$(CONTAINER_TEST_VERSION)" ]; then curl -L https://storage.googleapis.com/container-structure-test/v$(CONTAINER_TEST_VERSION)/container-structure-test-$(OS)-amd64 -o ./bin/container-structure-test-$(CONTAINER_TEST_VERSION); fi
 	chmod a+x ./bin/container-structure-test-$(CONTAINER_TEST_VERSION)
 	for image in "$(IMAGE_NAME):$(PREFIX)" "$(IMAGE_NAME):$(PREFIX)-build" "$(IMAGE_NAME):$(PREFIX)-shiny"; do \
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-container-metadata.yaml --image $$image; \
