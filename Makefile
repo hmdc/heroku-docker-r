@@ -73,7 +73,7 @@ push:
 	docker push $(IMAGE_TAG)-shiny
 
 
-test:
+test:	
 	# No reporting available yet.
 	# https://github.com/GoogleContainerTools/container-structure-test/issues/207
 	# Downloading container-structure-test
@@ -89,8 +89,8 @@ test:
 	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
 	# Simple curl test
-	docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION)
+	CONTAINER_ID:=$(shell docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION))
 	# Sleeping 10s
 	sleep 10s
 	# Running simple curl
-	curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f
+	docker exec -i -t $(CONTAINER_ID) curl --connect-timeout 20 --retry 20 --retry-delay 5 --retry-max-time 120 http://localhost:8080 -f
