@@ -1,4 +1,5 @@
-FROM hmdc/heroku-docker-r
+ARG R_VERSION
+FROM hmdc/heroku-docker-r:$R_VERSION
 
 # on build, copy application files
 ONBUILD COPY . /app

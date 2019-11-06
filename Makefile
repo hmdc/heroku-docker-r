@@ -15,10 +15,10 @@ GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 
 ifeq ($(GIT_BRANCH), master)
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
-	PREFIX:=$(R_VERSION)-
+	PREFIX:=$(R_VERSION)
 else
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_BRANCH)-$(GIT_SHA)
-	PREFIX:=$(R_VERSION)-$(GIT_BRANCH)-
+	PREFIX:=$(R_VERSION)-$(GIT_BRANCH)
 endif
 
 GIT_DATE:="$(shell TZ=UTC git show --quiet --date='format-local:%Y-%m-%d %H:%M:%S +0000' --format='%cd')"
@@ -37,30 +37,32 @@ build:
 		--build-arg GIT_DATE=$(GIT_DATE) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--tag $(IMAGE_TAG) \
-		--tag $(IMAGE_NAME):$(PREFIX)latest \
+		--tag $(IMAGE_NAME):$(PREFIX) \
 		--file Dockerfile .
 
 	# "build" image
 	docker build \
+		--build-arg R_VERSION=$(R_VERSION) \
 		--tag $(IMAGE_TAG)-build \
-		--tag $(IMAGE_NAME):$(PREFIX)build \
+		--tag $(IMAGE_NAME):$(PREFIX)-build \
 		--file Dockerfile.build .
 
 	# "shiny" image
 	docker build \
+		--build-arg R_VERSION=$(R_VERSION) \
 		--tag $(IMAGE_TAG)-shiny \
-		--tag $(IMAGE_NAME):$(PREFIX)shiny \
+		--tag $(IMAGE_NAME):$(PREFIX)-shiny \
 		--file Dockerfile.shiny .
 
 output:
-	docker save -o ${IMAGE_NAME}-$(PREFIX)latest.tar $(IMAGE_NAME):$(PREFIX)latest
-	docker save -o ${IMAGE_NAME}-$(PREFIX)build.tar $(IMAGE_NAME):$(PREFIX)build
-	docker save -o $(IMAGE_NAME)-$(PREFIX)shiny.tar $(IMAGE_NAME):$(PREFIX)shiny
+	docker save -o ${IMAGE_NAME}-$(PREFIX).tar $(IMAGE_NAME):$(PREFIX)
+	docker save -o ${IMAGE_NAME}-$(PREFIX)-build.tar $(IMAGE_NAME):$(PREFIX)-build
+	docker save -o $(IMAGE_NAME)-$(PREFIX)-shiny.tar $(IMAGE_NAME):$(PREFIX)-shiny
 
 push:
-	docker push $(IMAGE_NAME):$(PREFIX)latest
-	docker push $(IMAGE_NAME):$(PREFIX)build
-	docker push $(IMAGE_NAME):$(PREFIX)shiny
+	docker push $(IMAGE_NAME):$(PREFIX)
+	docker push $(IMAGE_NAME):$(PREFIX)-build
+	docker push $(IMAGE_NAME):$(PREFIX)-shiny
 	docker push $(IMAGE_TAG)
 	docker push $(IMAGE_TAG)-build
 	docker push $(IMAGE_TAG)-shiny
