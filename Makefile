@@ -86,7 +86,5 @@ test:
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-r-version-is-$(R_VERSION).yaml --image $$image; \
 	done
 	# Running tests on child imageg
-	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test
+	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
-
-
