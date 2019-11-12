@@ -1,7 +1,18 @@
 ARG R_VERSION
 FROM hmdc/heroku-docker-r:$R_VERSION
+COPY run_r_workers.sh startup.sh /usr/bin/
 
 # on build, copy application files
+RUN apt-get -y update; \
+    apt-get -y install apache2 libapache2-mod-auth-cas -qy --no-install-recommends; \
+    apt-get autoclean; \
+    rm -rf /var/lib/apt/lists/*; \
+    mkdir -p /app/apache/logs /app/apache/var/cache /app/apache/etc/apache2 /var/run/apache2; \
+    chmod a+x /usr/bin/run_r_workers.sh; \
+    chmod a+x /usr/bin/startup.sh
+
+COPY config/httpd.conf /app/apache/etc/apache2/httpd.conf
+
 ONBUILD COPY . /app
 
 # install shiny
@@ -16,3 +27,5 @@ ONBUILD RUN if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xa
 
 # on build, for backward compatibility, look for /app/init.R and if it exists, execute it
 ONBUILD RUN if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/init.R; fi;
+
+CMD /usr/bin/startup.sh

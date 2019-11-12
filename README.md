@@ -8,7 +8,7 @@ This is the docker image for applications which use [R][2] for statistical compu
 
 This project is compatible with the [heroku-buildpack-r][5] so that it is possible to migrate your existing Heroku R applications and deploy them using the new Heroku [`container`][7] stack, however there are some caveats if multiple buildpacks were used together with [heroku-buildpack-r][5].
 
-The new stack alleviates many of the complexities and issues with the R buildpack.
+The new stack alleviates many of the complexities and issues with the R buildpack.s
 
 Support has been added for [packrat][8], which is a package dependency manager.
 
