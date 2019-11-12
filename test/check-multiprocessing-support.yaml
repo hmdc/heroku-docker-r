@@ -1,0 +1,23 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: "startup.sh should exist"
+    path: "/usr/bin/startup.sh"
+    shouldExist: true
+    isExecutableBy: 'any'
+  - name: "run_r_workers.sh should exist"
+    path: "/usr/bin/run_r_workers.sh"
+    shouldExist: true
+    isExecutableBy: "any"
+  - name: "apache logs dir should exist"
+    path: "/app/apache/logs"
+    shouldExist: true
+  - name: "apache cache dir should exist"
+    path: "/app/apache/var/cache"
+    shouldExist: true
+  - name: "apache cfg dir exist"
+    path: "/app/apache/etc/apache2"
+    shouldExist: true
+  - name: "apache run dir should exist"
+    path: "/var/run/apache2"
+    shouldExist: true

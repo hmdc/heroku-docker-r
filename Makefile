@@ -88,6 +88,7 @@ test:
 	# Running tests on child image
 	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
+	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-multiprocessing-support.yaml --image shiny-app-hello-$(R_VERSION)
 	# Simple curl test
 	docker run -d -p 8080:8080 shiny-app-hello-$(R_VERSION)|while read CONTAINER_ID; do \
 		sleep 10s; \
