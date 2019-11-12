@@ -7,5 +7,4 @@ metadataTest:
     - key: LANG
       value: en_US.UTF-8
   entrypoint: []
-  cmd: ["/usr/bin/R", "--no-save"]
   workdir: "/app"
