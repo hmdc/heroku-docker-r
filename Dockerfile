@@ -27,11 +27,14 @@ ENV LANG en_US.UTF-8
 
 # copy over helpers script
 COPY helpers.R /etc/R/helpers.R
+COPY findSystemDependencies.sh /usr/bin
 # install R & set default CRAN repo
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
+  && chmod a+x /usr/bin/findSystemDependencies.sh \
   && echo 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' > /etc/apt/sources.list.d/cran.list \
   && apt-get update -q \
   && apt-get install -qy --no-install-recommends \
+    jq \
     libgsl0-dev \
     r-base-core=$APT_VERSION \
     r-base-dev=$APT_VERSION \
