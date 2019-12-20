@@ -21,7 +21,7 @@ ONBUILD RUN if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi;
 # on build, for backward compatibility, look for /app/Aptfile and if it exists, install the packages contained
 ONBUILD RUN if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xargs apt-get -qy install && rm -rf /var/lib/apt/lists/*; fi;
 ONBUILD RUN if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/init.R; fi;
-ONBUILD RUN if [ -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::restore()"; fi
+ONBUILD RUN if [ -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "options(repos = c(CRAN = "http://cran.rstudio.com")); packrat::restore()"; fi
 ONBUILD COPY . /app
-ONBUILD RUN if [ ! -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::init(); packrat::snapshot()"; fi
+ONBUILD RUN if [ ! -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "options(repos = c(CRAN = "http://cran.rstudio.com")); packrat::init(); packrat::snapshot()"; fi
 CMD /usr/bin/startup.sh
