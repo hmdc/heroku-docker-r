@@ -9,11 +9,12 @@ RUN apt-get -y update; \
     rm -rf /var/lib/apt/lists/*; \
     mkdir -p /app/apache/logs /app/apache/var/cache /app/apache/etc/apache2 /var/run/apache2; \
     chmod a+x /usr/bin/run_r_workers.sh; \
-    chmod a+x /usr/bin/startup.sh
-
+    chmod a+x /usr/bin/startup.sh; \
+    mkdir /app/packrat
 COPY config/httpd.conf /app/apache/etc/apache2/httpd.conf
 
-ONBUILD COPY Dockerfile .Rprofile* init.R* onbuild* Aptfile* packra[t] /app/
+ONBUILD COPY config/.noop .Rprofile* init.R* onbuild* Aptfile* /app/
+ONBUILD COPY config/.noop packra[t] /app/packrat/
 # on build, for installing additional dependencies etc.
 ONBUILD RUN /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite'))";
 ONBUILD RUN if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi;
