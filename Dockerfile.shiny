@@ -24,5 +24,5 @@ ONBUILD RUN if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --
 ONBUILD RUN if [ -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::restore()"; fi
 ONBUILD COPY . /app
 ONBUILD RUN if [ ! -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::init(); packrat::snapshot()"; fi
-ONBUILD RUN if [ ! -f "/app/.Rprofile" ]; then /usr/bin/R --no-save --quiet --slave -e "packrat::packify()"; fi
+ONBUILD RUN if [ ! -f "/app/.Rprofile" ]; then /usr/bin/R --no-save --quiet --slave -e "packrat::packify()"; echo "packrat::on()" >> /app/.Rprofile; fi
 CMD /usr/bin/startup.sh
