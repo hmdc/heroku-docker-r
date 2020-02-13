@@ -9,25 +9,20 @@ RUN apt-get -y update; \
     rm -rf /var/lib/apt/lists/*; \
     mkdir -p /app/apache/logs /app/apache/var/cache /app/apache/etc/apache2 /var/run/apache2; \
     chmod a+x /usr/bin/run_r_workers.sh; \
-    chmod a+x /usr/bin/startup.sh
-
+    chmod a+x /usr/bin/startup.sh; \
+    mkdir /app/packrat
 COPY config/httpd.conf /app/apache/etc/apache2/httpd.conf
-ONBUILD COPY Dockerfile .Rprofile* onbuild* Aptfile* packrat* /app/
 
-ONBUILD COPY . /app
-
+ONBUILD COPY Dockerfile .Rprofile* init.R* onbuild* Aptfile* /app/
+ONBUILD COPY Dockerfile packra[t] /app/packrat/
 # on build, for installing additional dependencies etc.
+ONBUILD RUN /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite'))";
 ONBUILD RUN if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi;
-
 # on build, for backward compatibility, look for /app/Aptfile and if it exists, install the packages contained
 ONBUILD RUN if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xargs apt-get -qy install && rm -rf /var/lib/apt/lists/*; fi;
-
-# install shiny
-ONBUILD RUN if [ -f "/app/packrat/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/packrat/init.R --args --bootstrap-packrat; fi;
-
-ONBUILD RUN if [ ! -f "/app/packrat/init.R" ]; then /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite'))"; apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::init(); packrat::snapshot()"; fi
-
-# on build, for backward compatibility, look for /app/init.R and if it exists, execute it
 ONBUILD RUN if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/init.R; fi;
-
+ONBUILD RUN if [ -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::restore()"; fi
+ONBUILD COPY . /app
+ONBUILD RUN if [ ! -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::init(); packrat::snapshot()"; fi
+ONBUILD RUN if [ ! -f "/app/.Rprofile" ]; then /usr/bin/R --no-save --quiet --slave -e "packrat::packify()"; echo "packrat::on()" >> /app/.Rprofile; fi
 CMD /usr/bin/startup.sh
