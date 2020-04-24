@@ -3,9 +3,9 @@ schemaVersion: "2.0.0"
 metadataTest:
   labels:
       - key: 'r.version'
-        value: '3.6.1'
+        value: '3.6.3'
 commandTests:
-  - name: "R version is 3.6.1"
+  - name: "R version is 3.6.3"
     command: "R"
     args: ["--version"]
-    expectedOutput: ["R version 3.6.1"]
+    expectedOutput: ["R version 3.6.3"]
