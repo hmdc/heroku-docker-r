@@ -63,7 +63,6 @@ build:
 
 output:
 	docker save -o hmdc-heroku-docker-r-$(PREFIX).tar $(IMAGE_NAME):$(PREFIX)
-	docker save -o hmdc-heroku-docker-r-$(PREFIX)-build.tar $(IMAGE_NAME):$(PREFIX)-build
 	docker save -o hmdc-heroku-docker-r-$(PREFIX)-shiny.tar $(IMAGE_NAME):$(PREFIX)-shiny
 
 push:
