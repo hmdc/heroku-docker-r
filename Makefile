@@ -15,6 +15,15 @@ OS:=$(shell uname | tr '[:upper:]' '[:lower:]')
 GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 CONTAINER_TEST_VERSION:=1.8.0
 
+ifeq ($(shell ./bin/semver get major $(R_VERSION)), 4)
+	CRAN_PATH:="cran40"
+	APT_VERSION:=$(R_VERSION)-1.1804.0
+endif
+
+ifeq ($(shell ./bin/semver get major $(R_VERSION)), 3)
+        CRAN_PATH:="cran35"
+endif
+
 ifeq ($(GIT_BRANCH), master)
 	IMAGE_TAG:=$(IMAGE_NAME):$(R_VERSION)-$(GIT_SHA)
 	PREFIX:=$(R_VERSION)
@@ -33,6 +42,7 @@ build:
 		--no-cache \
 		--pull \
 		--build-arg R_VERSION=$(R_VERSION) \
+		--build-arg CRAN_PATH=$(CRAN_PATH) \
 		--build-arg APT_VERSION=$(APT_VERSION) \
 		--build-arg MAINTAINER=$(MAINTAINER) \
 		--build-arg MAINTAINER_URL=$(MAINTAINER_URL) \

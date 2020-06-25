@@ -1,6 +1,7 @@
 FROM heroku/heroku:18-build
 
 ARG R_VERSION
+ARG CRAN_PATH
 ARG APT_VERSION
 ARG GIT_SHA
 ARG GIT_DATE
@@ -31,7 +32,7 @@ COPY findSystemDependencies.sh /usr/bin
 # install R & set default CRAN repo
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
   && chmod a+x /usr/bin/findSystemDependencies.sh \
-  && echo 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' > /etc/apt/sources.list.d/cran.list \
+  && echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-$CRAN_PATH/" > /etc/apt/sources.list.d/cran.list \
   && apt-get update -q \
   && apt-get install -qy --no-install-recommends \
     jq \
