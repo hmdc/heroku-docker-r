@@ -88,7 +88,7 @@ test:
 		./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-r-version-is-$(R_VERSION).yaml --image $$image; \
 	done
 	# Running tests on child image
-	docker build --build-arg R_VERSION=$(R_VERSION) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
+	docker build --build-arg R_VERSION=$(PREFIX) -f ./test/app/Dockerfile -t shiny-app-hello-$(R_VERSION) ./test/app
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-app-saved-to-image.yaml --image shiny-app-hello-$(R_VERSION)
 	./bin/container-structure-test-$(CONTAINER_TEST_VERSION) test -c ./test/check-multiprocessing-support.yaml --image shiny-app-hello-$(R_VERSION)
 	# Simple curl test
