@@ -30,6 +30,7 @@ build:
 
 	# "base" image
 	docker build \
+		--no-cache \
 		--pull \
 		--build-arg R_VERSION=$(R_VERSION) \
 		--build-arg APT_VERSION=$(APT_VERSION) \
@@ -42,16 +43,10 @@ build:
 		--tag $(IMAGE_NAME):$(PREFIX) \
 		--file Dockerfile .
 
-	# "build" image
-	docker build \
-		--build-arg R_VERSION=$(R_VERSION) \
-		--tag $(IMAGE_TAG)-build \
-		--tag $(IMAGE_NAME):$(PREFIX)-build \
-		--file Dockerfile.build .
-
 	# "shiny" image
 	docker build \
-		--build-arg R_VERSION=$(R_VERSION) \
+		--no-cache \
+		--build-arg R_VERSION=$(PREFIX) \
 		--tag $(IMAGE_TAG)-shiny \
 		--tag $(IMAGE_NAME):$(PREFIX)-shiny \
 		--file Dockerfile.shiny .
