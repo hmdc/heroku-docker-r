@@ -1,6 +1,7 @@
 FROM heroku/heroku:18-build
 
 ARG R_VERSION
+ARG CRAN_PATH
 ARG APT_VERSION
 ARG GIT_SHA
 ARG GIT_DATE
@@ -31,7 +32,7 @@ COPY findSystemDependencies.sh /usr/bin
 # install R & set default CRAN repo
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
   && chmod a+x /usr/bin/findSystemDependencies.sh \
-  && echo 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' > /etc/apt/sources.list.d/cran.list \
+  && echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-$CRAN_PATH/" > /etc/apt/sources.list.d/cran.list \
   && apt-get update -q \
   && apt-get install -qy --no-install-recommends \
     jq \
@@ -40,7 +41,8 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
     r-base-dev=$APT_VERSION \
   && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/* \
-  && echo 'options(repos = c(CRAN = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
+  && echo 'options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' > /etc/R/Rprofile.site \
+  && echo 'options(repos = c(CRAN = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest", CRAN_SRC = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
   && echo '.libPaths(c("/app/R/site-library", .libPaths()))' >> /etc/R/Rprofile.site \
   && echo 'source("/etc/R/helpers.R")' >> /etc/R/Rprofile.site \
   && mkdir -p /app/R/site-library

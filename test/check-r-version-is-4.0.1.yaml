@@ -1,0 +1,11 @@
+---
+schemaVersion: "2.0.0"
+metadataTest:
+  labels:
+      - key: 'r.version'
+        value: '4.0.1'
+commandTests:
+  - name: "R version is 4.0.1"
+    command: "R"
+    args: ["--version"]
+    expectedOutput: ["R version 4.0.1"]

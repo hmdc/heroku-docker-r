@@ -1,4 +1,4 @@
 .env
-bin
+bin/container-structure-test*
 .DS_Store
 .swp
