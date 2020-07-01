@@ -16,7 +16,7 @@ COPY config/httpd.conf /app/apache/etc/apache2/httpd.conf
 ONBUILD COPY Dockerfile .Rprofile* init.R* onbuild* Aptfile* /app/
 ONBUILD COPY Dockerfile packra[t] /app/packrat/
 # on build, for installing additional dependencies etc.
-ONBUILD RUN /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite', 'knitr'))" && \
+ONBUILD RUN /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite', 'knitr', 'remotes'))" && \
             echo "packrat::set_opts(ignored.directories = c('R'))" >> /app/.Rprofile && \
 	    if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi; \ 
 	    if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xargs apt-get -qy install && rm -rf /var/lib/apt/lists/*; fi; \
