@@ -1,4 +1,4 @@
-FROM heroku/heroku:18-build
+FROM ubuntu:18.04
 
 ARG R_VERSION
 ARG CRAN_PATH
@@ -18,34 +18,37 @@ LABEL "r.version"="$R_VERSION" \
       "maintainer"="$MAINTAINER" \
       "maintainer.url"="$MAINTAINER_URL"
 
-## Configure default locale
-RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
-  && locale-gen en_US.utf8 \
-  && /usr/sbin/update-locale LANG=en_US.UTF-8
-
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
 
-# copy over helpers script
 COPY helpers.R /etc/R/helpers.R
 COPY findSystemDependencies.sh /usr/bin
-# install R & set default CRAN repo
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
-  && chmod a+x /usr/bin/findSystemDependencies.sh \
-  && echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-$CRAN_PATH/" > /etc/apt/sources.list.d/cran.list \
-  && apt-get update -q \
-  && apt-get install -qy --no-install-recommends \
-    jq \
-    libgsl0-dev \
-    r-base-core=$APT_VERSION \
-    r-base-dev=$APT_VERSION \
-  && apt-get autoclean \
-  && rm -rf /var/lib/apt/lists/* \
-  && echo 'options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' > /etc/R/Rprofile.site \
-  && echo 'options(repos = c(CRAN = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest", CRAN_SRC = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
-  && echo '.libPaths(c("/app/R/site-library", .libPaths()))' >> /etc/R/Rprofile.site \
-  && echo 'source("/etc/R/helpers.R")' >> /etc/R/Rprofile.site \
-  && mkdir -p /app/R/site-library
+
+## Configure default locale
+RUN apt-get -y update && \
+    apt-get -y install ca-certificates locales language-pack-en gnupg2 curl && \
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen en_US.utf8 \
+    && /usr/sbin/update-locale LANG=en_US.UTF-8 \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $APT_GPG_KEY_ID \
+    && chmod a+x /usr/bin/findSystemDependencies.sh \
+    && echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-$CRAN_PATH/" > /etc/apt/sources.list.d/cran.list \
+    && apt-get update -q \
+    && apt-get install -qy --no-install-recommends \
+      jq \
+      libgsl0-dev \
+      netcat \
+      libopenblas-base \
+      r-base-core=$APT_VERSION \
+      r-base-dev=$APT_VERSION \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo 'options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' > /etc/R/Rprofile.site \
+    && echo 'options(repos = c(CRAN = "https://packagemanager.rstudio.com/all/__linux__/bionic/latest", CRAN_SRC = "https://cloud.r-project.org/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
+    && echo '.libPaths(c("/app/R/site-library", .libPaths()))' >> /etc/R/Rprofile.site \
+    && echo 'source("/etc/R/helpers.R")' >> /etc/R/Rprofile.site \
+    && mkdir -p /app/R/site-library
 
 # set /app as working directory
 WORKDIR /app

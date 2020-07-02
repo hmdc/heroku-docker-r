@@ -51,6 +51,7 @@ build:
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--tag $(IMAGE_TAG) \
 		--tag $(IMAGE_NAME):$(PREFIX) \
+		--squash \
 		--file Dockerfile .
 
 	# "shiny" image
@@ -59,6 +60,7 @@ build:
 		--build-arg R_VERSION=$(PREFIX) \
 		--tag $(IMAGE_TAG)-shiny \
 		--tag $(IMAGE_NAME):$(PREFIX)-shiny \
+		--squash \
 		--file Dockerfile.shiny .
 
 output:

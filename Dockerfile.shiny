@@ -11,6 +11,7 @@ RUN apt-get -y update; \
     chmod a+x /usr/bin/run_r_workers.sh; \
     chmod a+x /usr/bin/startup.sh; \
     mkdir /app/packrat
+
 COPY config/httpd.conf /app/apache/etc/apache2/httpd.conf
 
 ONBUILD COPY Dockerfile .Rprofile* init.R* onbuild* Aptfile* /app/
@@ -18,12 +19,17 @@ ONBUILD COPY Dockerfile packra[t] /app/packrat/
 # on build, for installing additional dependencies etc.
 ONBUILD RUN /usr/bin/R --no-save --quiet --slave -e "install.packages(c('packrat', 'jsonlite', 'knitr', 'remotes'))" && \
             echo "packrat::set_opts(ignored.directories = c('R'))" >> /app/.Rprofile && \
-	    if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi; \ 
-	    if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xargs apt-get -qy install && rm -rf /var/lib/apt/lists/*; fi; \
+	        if [ -f "/app/onbuild" ]; then bash /app/onbuild; fi; \ 
+	        if [ -f "/app/Aptfile" ]; then apt-get update -q && cat Aptfile | xargs apt-get -qy install && rm -rf /var/lib/apt/lists/*; fi; \
             if [ -f "/app/init.R" ]; then /usr/bin/R --no-init-file --no-save --quiet --slave -f /app/init.R; fi; \
             if [ -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::restore()"; fi
 ONBUILD COPY . /app
 ONBUILD RUN if [ ! -f "/app/packrat/packrat.lock" ]; then apt-get update -q; /usr/bin/findSystemDependencies.sh; /usr/bin/R --no-save --quiet --slave -e "packrat::init(); packrat::snapshot(ignore.stale=TRUE)"; fi; \
-	    if [ ! -f "/app/.Rprofile" ]; then /usr/bin/R --no-save --quiet --slave -e "packrat::packify()"; echo "packrat::on()" >> /app/.Rprofile; fi; \
-	    find /app -iname "*.Rmd" -not -path "/app/R/*" -not -path "/app/packrat/*" -exec /usr/bin/R --no-save --quiet --slave -e "rmarkdown::render('{}')" \;
+	        if [ ! -f "/app/.Rprofile" ]; then /usr/bin/R --no-save --quiet --slave -e "packrat::packify()"; echo "packrat::on()" >> /app/.Rprofile; fi; \
+	        find /app -iname "*.Rmd" -not -path "/app/R/*" -not -path "/app/packrat/*" -exec /usr/bin/R --no-save --quiet --slave -e "rmarkdown::render('{}')" \;; \
+	        rm -rf /app/packrat/src && \
+	        apt-get -y remove r-base-dev && \
+            apt-get -y autoremove && \
+            apt-get -y autoclean && \
+            rm -rf /var/lib/apt/lists/*
 CMD /usr/bin/startup.sh
